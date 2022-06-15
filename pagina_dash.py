@@ -20,10 +20,11 @@ app.layout = html.Div([
             html.H2("Options Dashboard"),
             html.Br(),
             html.H6("Type of option: "),
-            dcc.Dropdown(
+            dcc.RadioItems(
                 id='option-type',
                 options=[{'label': i, 'value': i} for i in option_type],
-                value='CALL'
+                value='CALL',
+                inline= True
             ),
             html.H6("Date: "),
             dcc.Dropdown(
@@ -68,4 +69,4 @@ def set_display_children(option_date, option_type):
     return fig
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, host='0.0.0.0', port=8080)

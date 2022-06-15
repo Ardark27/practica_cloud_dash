@@ -12,7 +12,7 @@ def main():
             if j != 'FUTURO':
                 for k in a[i][j].keys(): #dates de opciones
                     print(i, j, k, a[i][j][k])
-                    for l in a[i][j][k].keys():
+                    for l in a[i][j][k].keys(): #Typos de strike, volatilidad, price
                         print(i, j, k, l, a[i][j][k][l])
     return 0
 
