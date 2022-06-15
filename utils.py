@@ -1,0 +1,21 @@
+import json
+
+def load_json(filename):
+    with open(filename, 'r') as f:
+        return json.load(f)
+
+
+def main():
+    a = load_json('14_06_2022.json')
+    for i in a.keys():
+        for j in a[i].keys():
+            if j != 'FUTURO':
+                for k in a[i][j].keys():
+                    print(i, j, k, a[i][j][k])
+                    for l in a[i][j][k].keys():
+                        print(i, j, k, l, a[i][j][k][l])
+    return 0
+
+
+if __name__ == '__main__':
+    main()
