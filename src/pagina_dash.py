@@ -16,7 +16,7 @@ server = app.server
 
 
 dates_list = db.get_all_dates()
-a = db.get_data_from_date(dates_list[0])
+
 option_type = ['CALL', 'PUT']
 
 app.layout = html.Div([
@@ -30,9 +30,11 @@ app.layout = html.Div([
                 value='CALL',
                 inline= True
             ),
-            html.H6("Day of data extraction: "),
+            html.H6("Date of data extraction: "),
             dcc.Dropdown(
-                id='data-date'
+                id='data-date',
+                options=[{'label': i, 'value': i} for i in dates_list],
+                value = dates_list[0]
             ),
             html.H6("Date: "),
             dcc.Dropdown(
@@ -52,23 +54,18 @@ app.layout = html.Div([
     )
 ])
 
-@app.callback(
-    Output('data-date', 'options'),
-    Input('date-search', 'value'))
-def set_date_data(date_search):
-    for i in a.keys():
-        for j in a[i].keys():
-            if j == option_type:
-                return [{'label': i, 'value': i} for i in a[i][j].keys()]
+
 
 @app.callback(
     Output('option-date', 'options'),
-    Input('option-type', 'value'))
-def set_tickers(option_type):
-    for i in a.keys():
-        for j in a[i].keys():
-            if j == option_type:
-                return [{'label': i, 'value': i} for i in a[i][j].keys()]
+    Input('option-type', 'value'),
+    Input('data-date', 'value'))
+def set_tickers(option_type,data_date):
+    global a
+    a = db.get_data_from_date(data_date)
+    for j in a.keys():
+        if j == option_type:
+            return [{'label': i, 'value': i} for i in a[j].keys()]
 
 
 
@@ -85,9 +82,9 @@ def set_cities_value(option_date):
     Input('option-type', 'value'),
     Input('option-data-available', 'value'))
 def set_display_children(option_date, option_type, option_data_availiable):
-    for i in a.keys():
-        strike = a[i][option_type][option_date]['strikes']
-        data = a[i][option_type][option_date][option_data_availiable]
+
+    strike = a[option_type][option_date]['strikes']
+    data = a[option_type][option_date][option_data_availiable]
     
     df = pd.DataFrame({'Strike': strike, option_data_availiable : data})
     fig = px.line(df, x='Strike', y=f'{option_data_availiable}', markers = True)
