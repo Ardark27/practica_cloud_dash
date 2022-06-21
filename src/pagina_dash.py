@@ -6,13 +6,15 @@ import plotly.express as px
 import pandas as pd
 import utils as ut
 from dash.dependencies import Input, Output
+import db 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__,
 external_stylesheets=external_stylesheets)
+server = app.server
 
-a = ut.load_json('14_06_2022.json')
+dates_list = db.get_all_dates()
 option_type = ['CALL', 'PUT']
 
 app.layout = html.Div([
@@ -25,6 +27,10 @@ app.layout = html.Div([
                 options=[{'label': i, 'value': i} for i in option_type],
                 value='CALL',
                 inline= True
+            ),
+            html.H6("Day of data extraction: "),
+            dcc.Dropdown(
+                id='data-date'
             ),
             html.H6("Date: "),
             dcc.Dropdown(
@@ -45,9 +51,20 @@ app.layout = html.Div([
 ])
 
 @app.callback(
+    Output('data-date', 'options'),
+    Input('date-search', 'value'))
+def set_date_data(date_search):
+    a = db.get_data_from_date(dates_list[0])
+    for i in a.keys():
+        for j in a[i].keys():
+            if j == option_type:
+                return [{'label': i, 'value': i} for i in a[i][j].keys()]
+
+@app.callback(
     Output('option-date', 'options'),
     Input('option-type', 'value'))
 def set_tickers(option_type):
+    a = db.get_data_from_date(dates_list[0])
     for i in a.keys():
         for j in a[i].keys():
             if j == option_type:
@@ -77,4 +94,4 @@ def set_display_children(option_date, option_type, option_data_availiable):
     return fig
 
 if __name__ == '__main__':
-    app.run_server(debug=True, host='0.0.0.0', port=8080)
+    app.run_server(debug=True, host="0.0.0.0", port=8080, use_reloader=True)
