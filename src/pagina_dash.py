@@ -91,4 +91,4 @@ def set_display_children(option_date, option_type, option_data_availiable):
     return fig
 
 if __name__ == '__main__':
-    app.run_server(debug=False, host="0.0.0.0", use_reloader=False)
+    app.run_server(debug=False, host="0.0.0.0", port=8080, use_reloader=False)
