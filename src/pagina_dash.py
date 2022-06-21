@@ -55,6 +55,11 @@ app.layout = html.Div([
     ),
     dcc.Graph(
         id='display-surface'
+    ),
+    dcc.Slider(0,len(dates_list)-1,step=None,
+        id='slider-surface',
+        marks={i:dates_list[i] for i in range(len(dates_list))},
+        value=0
     )
 ])
 
@@ -97,9 +102,12 @@ def set_display_children(option_date, option_type, option_data_availiable):
 @app.callback(
     Output('display-surface', 'figure'),
     Input('option-type', 'value'),
-    Input('data-date', 'value'))
+    Input('slider-surface', 'value'))
 def set_display_surface_children(option_type,data_date):
-    option_data = ut.data_to_df(data_date,a,option_type)
+    
+    a = db.get_data_from_date(dates_list[data_date])
+
+    option_data = ut.data_to_df(dates_list[data_date],a,option_type)
     X,Y,Z = ut.prepare_df_to_graph(option_data)
 
     fig = go.Figure(data=[go.Surface(z=Z, x=X, y=Y)])

@@ -1,5 +1,4 @@
 import json
-import src.utils as ut
 import pandas as pd
 import numpy as np
 from scipy.interpolate import griddata
@@ -27,9 +26,9 @@ def data_to_df(day_to_compare,data,option_type):
                 elif j == 'PUT':
                     put_1 = pd.DataFrame(data = [impliedVolatility], columns=strikes, index=[delta_days])
                     put = pd.concat([put, put_1])
-    if type == 'CALL':
+    if option_type == 'CALL':
         return call
-    if type == 'PUT':
+    if option_type == 'PUT':
         return put
 
 def prepare_df_to_graph(option_data):
@@ -47,4 +46,5 @@ def prepare_df_to_graph(option_data):
     yi = np.linspace(y.min(),y.max(),100)
     X,Y = np.meshgrid(xi,yi)
     Z = griddata((x,y),z,(X,Y),method='cubic')
+    Z[Z<0]=0
     return X, Y, Z
