@@ -14,7 +14,9 @@ app = dash.Dash(__name__,
 external_stylesheets=external_stylesheets)
 server = app.server
 
+
 dates_list = db.get_all_dates()
+a = db.get_data_from_date(dates_list[0])
 option_type = ['CALL', 'PUT']
 
 app.layout = html.Div([
@@ -54,7 +56,6 @@ app.layout = html.Div([
     Output('data-date', 'options'),
     Input('date-search', 'value'))
 def set_date_data(date_search):
-    a = db.get_data_from_date(dates_list[0])
     for i in a.keys():
         for j in a[i].keys():
             if j == option_type:
@@ -64,7 +65,6 @@ def set_date_data(date_search):
     Output('option-date', 'options'),
     Input('option-type', 'value'))
 def set_tickers(option_type):
-    a = db.get_data_from_date(dates_list[0])
     for i in a.keys():
         for j in a[i].keys():
             if j == option_type:
