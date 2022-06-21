@@ -1,6 +1,10 @@
 FROM python:3.9-slim
 
-COPY requirements.txt ./requirements.txt
+WORKDIR /code
+
+COPY requirements.txt .
 RUN pip install -r requirements.txt
-COPY . ./
+COPY src/ .
+
+EXPOSE 8080
 CMD ["python", "pagina_dash.py"]
