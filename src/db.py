@@ -8,7 +8,6 @@ load_dotenv()
 
 ID_KEY = os.getenv('ID_KEY')
 SECRET_KEY = os.getenv('AWS_SECRET_KEY')
-DB_TABLE = os.getenv('DB_TABLE')
 
 session = boto3.Session(
     aws_access_key_id=ID_KEY,
