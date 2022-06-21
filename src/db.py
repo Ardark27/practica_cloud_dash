@@ -2,20 +2,21 @@ import boto3
 import os
 import pandas as pd
 import json
+from dotenv import load_dotenv
 
-ID_KEY = os.environ.get('ID_KEY', None)
-SECRET_KEY = os.environ.get('AWS_SECRET_KEY', None)
-DB_TABLE = os.environ.get('DB_TABLE', None)
-REGION = os.environ.get('REGION', None)
+load_dotenv()
+
+ID_KEY = os.getenv('ID_KEY')
+SECRET_KEY = os.getenv('AWS_SECRET_KEY')
 
 session = boto3.Session(
     aws_access_key_id=ID_KEY,
     aws_secret_access_key=SECRET_KEY,
-    region_name=REGION
+    region_name="eu-west-3"
 )
 dynamodb = session.resource('dynamodb')
 
-table = dynamodb.Table(DB_TABLE)
+table = dynamodb.Table('option_data_ibex')
 
 def get_data_from_date(date):
     response = table.get_item(
@@ -29,3 +30,5 @@ def get_all_dates():
     response = table.scan(AttributesToGet=['date'])
     data = pd.DataFrame.from_dict(response['Items']).sort_values('date').date.values.tolist()
     return data
+
+print(get_all_dates())

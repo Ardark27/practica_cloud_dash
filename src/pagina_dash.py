@@ -116,4 +116,4 @@ def set_display_surface_children(option_type,data_date):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True, host="0.0.0.0", port=8080, use_reloader=True)
+    app.run_server(debug=False, host="0.0.0.0", port=8080, use_reloader=False)
