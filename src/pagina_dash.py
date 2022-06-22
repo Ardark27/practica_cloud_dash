@@ -60,7 +60,21 @@ app.layout = html.Div([
         id='slider-surface',
         marks={i:dates_list[i] for i in range(len(dates_list))},
         value=0
-    )
+    ),
+    html.Br(),
+    # dcc.Dropdown(
+    #     id='option-date-compare-one',
+    #     options=[{'label': i, 'value': i} for i in dates_list],
+    #     value = dates_list[0]
+    # ),
+    # dcc.Dropdown(
+    #     id='option-date-compare-two',
+    #     options=[{'label': i, 'value': i} for i in dates_list],
+    #     value = dates_list[1]
+    # ),
+    # dcc.Graph(
+    #     id='display-compare-days'
+    # ),
 ])
 
 
@@ -98,6 +112,30 @@ def set_display_children(option_date, option_type, option_data_availiable):
     df = pd.DataFrame({'Strike': strike, option_data_availiable : data})
     fig = px.line(df, x='Strike', y=f'{option_data_availiable}', markers = True)
     return fig
+
+# @app.callback(
+#     Output('display-compare-days', 'figure'),
+#     Input('option-date', 'value'),
+#     Input('option-date-compare-one', 'value'),
+#     Input('option-date-compare-two', 'value'),
+#     Input('option-type', 'value'),
+#     Input('option-data-available', 'value'))
+# def set_display_compare_days(option_date,option_date_compare_one,option_date_compare_two,option_type, option_data_availiable):
+    
+#     b = db.get_data_from_date(option_date_compare_two)
+#     c = db.get_data_from_date(option_date_compare_one)
+#     print(b['CALL'].keys())
+#     strike = c[option_type][option_date]['strikes']
+#     data = c[option_type][option_date][option_data_availiable]
+    
+#     strike_day2 = b[option_type][option_date]['strikes']
+#     data_day2 = b[option_type][option_date][option_data_availiable]
+    
+#     df = pd.DataFrame({'Strike': strike, option_data_availiable : data})
+#     df_day2 = pd.DataFrame({'Strike': strike_day2, option_data_availiable : data_day2})
+#     fig = px.line(df, x='Strike', y=f'{option_data_availiable}', markers = True)
+#     fig = px.line(df_day2, x='Strike', y=f'{option_data_availiable}', markers = True)
+#     return fig
 
 @app.callback(
     Output('display-surface', 'figure'),
