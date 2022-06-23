@@ -10,7 +10,7 @@ from dash import Input, Output, dcc, html
 import db
 import utils as ut
 
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP]) #[dark,light], [CYBORG,BOOTSTRAP]
 
 dates_list = db.get_all_dates()
 
@@ -52,7 +52,7 @@ def render_tab_content(active_tab):
     if active_tab is not None:
         # we have the entire option-simple tab here
         if active_tab == "option-simple":
-            content = [
+            content = [html.Div([
                 html.H6("Type of option: "),
             dbc.RadioItems(
                 id='option-type',
@@ -83,6 +83,9 @@ def render_tab_content(active_tab):
                 options=[{'label': i, 'value': i} for i in ['prices', 'impliedVolatility']],
                 value='impliedVolatility'
             ),
+            ],
+            style={'width': '45%','text-align': 'center', 'margin':'auto'}
+            ),
             dcc.Graph(
                 id='display-option-simple'
             )
@@ -92,7 +95,7 @@ def render_tab_content(active_tab):
             content=['Aqui hay que poner todo la pagina de las comparaciones']
             return content
         elif active_tab == "surface-vol":
-            content = [
+            content = [html.Div([
                 dbc.RadioItems(
                     id='option-type',
                     className="btn-group",
@@ -102,15 +105,18 @@ def render_tab_content(active_tab):
                     options=[{'label': i, 'value': i} for i in option_type],
                     value='CALL'
                 ),
-                dcc.Graph(
-                        id='display-surface'
-                ),
                 dcc.Slider(0,len(dates_list)-1,step=None,
                     id='slider-surface',
                     marks={i:dates_list[i] for i in range(len(dates_list))},
                     value=0
-                )
-            ]
+                ),
+                html.Br(),
+                html.H5(id='titulo-superficie-vol'),
+                dcc.Graph(
+                        id='display-surface'
+                ),
+                
+            ],style={'width': '90%','text-align': 'center', 'margin':'auto'})]
             return content
     return "No tab selected"
 
@@ -132,6 +138,12 @@ def set_tickers(option_type,data_date):
     Input('option-date', 'options'))
 def set_cities_value(option_date):
     return option_date[0]['value']
+
+@app.callback(
+    Output('titulo-superficie-vol', 'children'),
+    Input('slider-surface', 'value'))
+def set_title_surface(option_date):
+    return f'Superficie de volatilidad día {dates_list[option_date]}'
 
 
 @app.callback(
@@ -160,9 +172,11 @@ def set_display_surface_children(option_type,data_date):
     X,Y,Z = ut.prepare_df_to_graph(option_data)
 
     fig = go.Figure(data=[go.Surface(z=Z, x=X, y=Y)])
-    fig.update_layout(title='Superficie de volatidad', autosize=False,
-                    width=500, height=500,
-                    margin=dict(l=65, r=50, b=65, t=90),
+    fig.update_layout(#title='Superficie de volatidad',
+                    autosize=True,
+                    #width=750,
+                    height=750,
+                    margin=dict(l=20, r=30, b=65, t=50),
                     scene=dict(
                         xaxis_title='Strike',
                         yaxis_title='Days_to_go',
@@ -174,4 +188,4 @@ def set_display_surface_children(option_type,data_date):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=False, port=8888)
+    app.run_server(debug=True, port=8888)
