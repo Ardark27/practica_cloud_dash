@@ -8,4 +8,4 @@ COPY src/ .
 
 EXPOSE 8080
 
-CMD ["python", "pagina_dash.py"]
+CMD ["python", "app.py"]
