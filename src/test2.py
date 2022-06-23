@@ -18,12 +18,20 @@ session = boto3.Session(
 dynamodb = session.resource('dynamodb')
 
 table = dynamodb.Table('option_data_ibex')
-list_items = table.scan(AttributesToGet=['info'])['Items']
-keys_list = []
-for e in range(len(list_items)):
-    keys = json.loads(list_items[e].get('info'))['CALL'].keys()
-    for key in keys:
-        keys_list.append(key)
-    
-dates_sorted = pd.Series(keys_list).sort_values(ascending=True).unique().tolist()
-print(dates_sorted)
+
+def obtain_data_compare():
+    list_items = table.scan(AttributesToGet=['info'])['Items']
+    option ='CALL' 
+    keys_list = []
+    for e in range(len(list_items)):
+        keys = json.loads(list_items[e].get('info'))[option].keys()
+        # print(keys.get('2022-06-24'))
+        # break
+        for key in keys:
+            l = len(json.loads(list_items[e].get('info'))[option][key]['strikes'])
+            keys_list.append({'date': key, 'indice': e , 'count':l})    
+
+    df = pd.DataFrame.from_dict(keys_list)
+    idx = df.groupby('date')['count'].transform(max) == df['count']
+    df = df[idx].drop_duplicates(subset=['date'])
+    return list_items, df
