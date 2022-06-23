@@ -259,4 +259,4 @@ def set_display_comparator_children(option_type,first_date_compare,second_date_c
 
 
 if __name__ == "__main__":
-    app.run_server(debug=False, port=8888)
+   app.run_server(debug=False, host="0.0.0.0", port=8080)
