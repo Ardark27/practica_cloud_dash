@@ -9,8 +9,14 @@ import pandas as pd
 from dash import Input, Output, dcc, html
 import db
 import utils as ut
+from dash_bootstrap_templates import ThemeSwitchAIO
 
-app = dash.Dash(external_stylesheets=[dbc.themes.SKETCHY]) #[dark,light], [CYBORG,BOOTSTRAP]
+app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP]) #[dark,light], [CYBORG,BOOTSTRAP]
+
+template_theme1 = 'flatly'
+template_theme2 = 'vapor'
+url_theme1 = dbc.themes.FLATLY
+url_theme2 = dbc.themes.VAPOR
 
 dates_list = db.get_all_dates()
 option_type = ['CALL', 'PUT']
@@ -20,6 +26,7 @@ app.layout = dbc.Container(
         dcc.Store(id="store"),
         html.Br(),
         html.H1("Options Dashboard"),
+        ThemeSwitchAIO(aio_id="theme", themes=[url_theme1, url_theme2]),
         html.Hr(),
         dbc.Tabs(
             [
@@ -41,9 +48,11 @@ app.layout = dbc.Container(
 
 @app.callback(
     Output("tab-content", "children"),
+    Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
     [Input("tabs", "active_tab")],
 )
-def render_tab_content(active_tab):
+def render_tab_content(toggle,active_tab):
+    template = template_theme1 if toggle else template_theme2
     """
     This callback takes the 'active_tab' property as input, as well as the
     stored graphs, and renders the tab content depending on what the value of
@@ -71,7 +80,8 @@ def render_tab_content(active_tab):
             ),
             html.H6("Día de vencimiento : "),
             dcc.Dropdown(
-                id='option-date'
+                id='option-date',
+                
             ),
             html.H6("Datos disponibles"),
             dbc.RadioItems(
@@ -105,27 +115,29 @@ def render_tab_content(active_tab):
                 value='CALL'
             ),
             dbc.Row([
+                html.Br(),
                 dbc.Col([
-                    html.H6("Fecha de toma de datos :"),
+                    dbc.Label("Fecha de toma de datos :"),
                     dcc.Dropdown(
                         id='first-date-compare',
                         options=[{'label': i, 'value': i} for i in dates_list],
-                        value = dates_list[0]
+                        value = dates_list[0],
+                        clearable=False,
                     ),
-                    html.H6("Día de vencimiento : "),
+                    dbc.Label("Día de vencimiento : "),
                     dcc.Dropdown(
                         id='option-date-first',
                     ),
                 ]),
-                
+                html.Br(),
                 dbc.Col([
-                    html.H6("Fecha de toma de datos 2:"),
+                    dbc.Label("Fecha de toma de datos 2:"),
                     dcc.Dropdown(
                         id='second-date-compare',
                         options=[{'label': i, 'value': i} for i in dates_list],
                         value = dates_list[1]
                     ),
-                    html.H6("Día de vencimiento : "),
+                    dbc.Label("Día de vencimiento : "),
                     dcc.Dropdown(
                         id='option-date-second',
                     ),
@@ -133,6 +145,7 @@ def render_tab_content(active_tab):
             ],
             align="center",
             ),
+            html.Br(),
             dcc.Graph(
                     id='display-comparator-options'
                     )
@@ -227,24 +240,26 @@ def set_title_surface(option_date):
 
 @app.callback(
     Output('display-option-simple', 'figure'),
+    Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
     Input('option-date', 'value'),
     Input('option-type', 'value'),
     Input('option-data-available', 'value'))
-def set_display_children(option_date, option_type, option_data_availiable):
-
+def set_display_children(toggle,option_date, option_type, option_data_availiable):
+    template = template_theme1 if toggle else template_theme2
     strike = a[option_type][option_date]['strikes']
     data = a[option_type][option_date][option_data_availiable]
     
     df = pd.DataFrame({'Strike': strike, option_data_availiable : data})
-    fig = px.line(df, x='Strike', y=f'{option_data_availiable}', markers = True)
+    fig = px.line(df, x='Strike', y=f'{option_data_availiable}', markers = True, template=template)
     return fig
 
 @app.callback(
     Output('display-surface', 'figure'),
+    Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
     Input('option-type', 'value'),
     Input('slider-surface', 'value'))
-def set_display_surface_children(option_type,data_date):
-    
+def set_display_surface_children(toggle,option_type,data_date):
+    template = template_theme1 if toggle else template_theme2
     a = db.get_data_from_date(dates_list[data_date])
 
     option_data = ut.data_to_df(dates_list[data_date],a,option_type)
@@ -260,7 +275,7 @@ def set_display_surface_children(option_type,data_date):
                         xaxis_title='Strike',
                         yaxis_title='Days_to_go',
                         zaxis_title='ImpliedVolatility'
-                    ))
+                    ),template=template)
 
     return fig
 
@@ -271,15 +286,17 @@ def set_display_surface_children(option_type,data_date):
     Input('option-date-second', 'value'),
     Input('option-type', 'value'),
     Input('first-date-compare', 'value'),
-    Input('second-date-compare', 'value'))
+    Input('second-date-compare', 'value'),
+    Input(ThemeSwitchAIO.ids.switch("theme"), "value"),)
 def set_display_comparator_children(
     option_date_first,
     option_date_second,
     option_type,
     first_date_compare,
-    second_date_compare
+    second_date_compare,
+    toggle
     ):
-
+    template = template_theme1 if toggle else template_theme2
     
     b = db.get_data_from_date(first_date_compare)
     c = db.get_data_from_date(second_date_compare)
@@ -295,7 +312,7 @@ def set_display_comparator_children(
     df_2 = pd.DataFrame({'Volatilidad implícita': second_vol, 'Strike' : second_stk,
                          'Opciones':f'Día {second_date_compare}, vencimiento {option_date_second}'})
     df = pd.concat([df_1,df_2])
-    fig = px.line(df, x='Strike', y='Volatilidad implícita',color='Opciones', markers = True)
+    fig = px.line(df, x='Strike', y='Volatilidad implícita',color='Opciones', markers = True, template=template)
 
     return fig
 
