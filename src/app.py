@@ -10,7 +10,7 @@ from dash import Input, Output, dcc, html
 import db
 import utils as ut
 
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP]) #[dark,light], [CYBORG,BOOTSTRAP]
+app = dash.Dash(external_stylesheets=[dbc.themes.SKETCHY]) #[dark,light], [CYBORG,BOOTSTRAP]
 
 dates_list = db.get_all_dates()
 option_type = ['CALL', 'PUT']
@@ -53,7 +53,7 @@ def render_tab_content(active_tab):
         # we have the entire option-simple tab here
         if active_tab == "option-simple":
             content = [html.Div([
-                html.H6("Type of option: "),
+                html.H6("Tipo de opción: "),
             dbc.RadioItems(
                 id='option-type',
                 className="btn-group",
@@ -63,17 +63,17 @@ def render_tab_content(active_tab):
                 options=[{'label': i, 'value': i} for i in option_type],
                 value='CALL'
             ),
-            html.H6("Date of data extraction: "),
+            html.H6("Fecha de toma de datos :"),
             dcc.Dropdown(
                 id='data-date',
                 options=[{'label': i, 'value': i} for i in dates_list],
                 value = dates_list[0]
             ),
-            html.H6("Date: "),
+            html.H6("Día de vencimiento : "),
             dcc.Dropdown(
                 id='option-date'
             ),
-            html.H6("Data Avaliable"),
+            html.H6("Datos disponibles"),
             dbc.RadioItems(
                 id='option-data-available',
                 className="btn-group",
@@ -94,7 +94,7 @@ def render_tab_content(active_tab):
         elif active_tab == "option-comparator":
             content=[
             html.Div([
-            html.H6("Type of option: "),
+            html.H6("Tipo de opción: "),
             dbc.RadioItems(
                 id='option-type',
                 className="btn-group",
@@ -106,26 +106,26 @@ def render_tab_content(active_tab):
             ),
             dbc.Row([
                 dbc.Col([
-                    html.H6("Select first date: "),
+                    html.H6("Fecha de toma de datos :"),
                     dcc.Dropdown(
                         id='first-date-compare',
                         options=[{'label': i, 'value': i} for i in dates_list],
                         value = dates_list[0]
                     ),
-                    html.H6("Select first data date: "),
+                    html.H6("Día de vencimiento : "),
                     dcc.Dropdown(
                         id='option-date-first',
                     ),
                 ]),
                 
                 dbc.Col([
-                    html.H6("Second date to compare: "),
+                    html.H6("Fecha de toma de datos 2:"),
                     dcc.Dropdown(
                         id='second-date-compare',
                         options=[{'label': i, 'value': i} for i in dates_list],
                         value = dates_list[1]
                     ),
-                    html.H6("Select second data date: "),
+                    html.H6("Día de vencimiento : "),
                     dcc.Dropdown(
                         id='option-date-second',
                     ),
@@ -290,9 +290,12 @@ def set_display_comparator_children(
     second_stk = c[option_type][option_date_second]['strikes']
     second_vol = c[option_type][option_date_second]['impliedVolatility']
 
-    df = pd.DataFrame([{'impliedVolatility': first_vol, 'Strike' : first_stk, 'date':option_date_first}, 
-                            {'impliedVolatility': second_vol, 'Strike' : second_stk, 'date': option_date_second}])
-    fig = px.line(df[df.date.isin([option_date_first,option_date_second])], x='Strike', y='impliedVolatility',color='date', markers = True)
+    df_1 = pd.DataFrame({'Volatilidad implícita': first_vol, 'Strike' : first_stk,
+                         'Opciones':f'Día {first_date_compare}, vencimiento {option_date_first}'}) 
+    df_2 = pd.DataFrame({'Volatilidad implícita': second_vol, 'Strike' : second_stk,
+                         'Opciones':f'Día {second_date_compare}, vencimiento {option_date_second}'})
+    df = pd.concat([df_1,df_2])
+    fig = px.line(df, x='Strike', y='Volatilidad implícita',color='Opciones', markers = True)
 
     return fig
 
