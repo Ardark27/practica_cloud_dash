@@ -49,8 +49,3 @@ def prepare_df_to_graph(option_data):
     Z[Z<0]=0
     return X, Y, Z
 
-def process_json_data(list_items,option,key, indice):
-    print(key,indice)
-    stk =json.loads(list_items[indice].get('info'))[option][key]['strikes']
-    vol =json.loads(list_items[indice].get('info'))[option][key]['impliedVolatility']
-    return stk, vol

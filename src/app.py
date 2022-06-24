@@ -13,8 +13,6 @@ import utils as ut
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP]) #[dark,light], [CYBORG,BOOTSTRAP]
 
 dates_list = db.get_all_dates()
-list_items , dates_compare_df = db.obtain_data_compare()
-arr_dates_compare = dates_compare_df.date.values.tolist()
 option_type = ['CALL', 'PUT']
 
 app.layout = dbc.Container(
@@ -97,7 +95,6 @@ def render_tab_content(active_tab):
             content=[
             html.Div([
             html.H6("Type of option: "),
-                
             dbc.RadioItems(
                 id='option-type',
                 className="btn-group",
@@ -107,26 +104,42 @@ def render_tab_content(active_tab):
                 options=[{'label': i, 'value': i} for i in option_type],
                 value='CALL'
             ),
-            
-            html.H6("Select first date: "),
-            dcc.Dropdown(
-                id='first-date-compare',
-                options=[{'label': i, 'value': i} for i in arr_dates_compare],
-                value = arr_dates_compare[0]
-            ),
-            
-            html.H6("Second date to compare: "),
-            dcc.Dropdown(
-                id='second-date-compare',
-                options=[{'label': i, 'value': i} for i in arr_dates_compare],
-                value = arr_dates_compare[1]
-            ),
+            dbc.Row([
+                dbc.Col([
+                    html.H6("Select first date: "),
+                    dcc.Dropdown(
+                        id='first-date-compare',
+                        options=[{'label': i, 'value': i} for i in dates_list],
+                        value = dates_list[0]
+                    ),
+                    html.H6("Select first data date: "),
+                    dcc.Dropdown(
+                        id='option-date-first',
+                    ),
+                ]),
+                
+                dbc.Col([
+                    html.H6("Second date to compare: "),
+                    dcc.Dropdown(
+                        id='second-date-compare',
+                        options=[{'label': i, 'value': i} for i in dates_list],
+                        value = dates_list[1]
+                    ),
+                    html.H6("Select second data date: "),
+                    dcc.Dropdown(
+                        id='option-date-second',
+                    ),
+                ])   
             ],
-            style={'width': '45%','text-align': 'center', 'margin':'auto'}
+            align="center",
             ),
             dcc.Graph(
-                id='display-comparator-options'
-            )
+                    id='display-comparator-options'
+                    )
+            ],
+            style={'text-align': 'center', 'margin':'auto'}
+            ),
+            
             ]
             return content
         elif active_tab == "surface-vol":
@@ -165,7 +178,38 @@ def set_tickers(option_type,data_date):
     for j in a.keys():
         if j == option_type:
             return [{'label': i, 'value': i} for i in a[j].keys()]
-
+        
+@app.callback(
+    Output('option-date-first', 'options'),
+    Input('option-type', 'value'),
+    Input('first-date-compare', 'value'))
+def set_tickers(option_type,firs_date_compare):
+    global a
+    a = db.get_data_from_date(firs_date_compare)
+    for j in a.keys():
+        if j == option_type:
+            return [{'label': i, 'value': i} for i in a[j].keys()]
+@app.callback(
+    Output('option-date-first', 'value'),
+    Input('option-date-first', 'options'))
+def set_cities_value(option_date):
+    return option_date[0]['value']
+    
+@app.callback(
+    Output('option-date-second', 'options'),
+    Input('option-type', 'value'),
+    Input('second-date-compare', 'value'))
+def set_tickers(option_type,second_date_compare):
+    global a
+    a = db.get_data_from_date(second_date_compare)
+    for j in a.keys():
+        if j == option_type:
+            return [{'label': i, 'value': i} for i in a[j].keys()]
+@app.callback(
+    Output('option-date-second', 'value'),
+    Input('option-date-second', 'options'))
+def set_cities_value(option_date):
+    return option_date[0]['value']
 
 
 @app.callback(
@@ -223,40 +267,36 @@ def set_display_surface_children(option_type,data_date):
 
 @app.callback(
     Output('display-comparator-options', 'figure'),
+    Input('option-date-first', 'value'),
+    Input('option-date-second', 'value'),
     Input('option-type', 'value'),
     Input('first-date-compare', 'value'),
     Input('second-date-compare', 'value'))
-def set_display_comparator_children(option_type,first_date_compare,second_date_compare):
-    
-    first_date_row = dates_compare_df[dates_compare_df['date'] ==first_date_compare]
-    second_date_row = dates_compare_df[dates_compare_df['date'] ==second_date_compare]
-    first_stk, first_vol = ut.process_json_data(list_items,option_type,first_date_compare,first_date_row.indice.values[0])
-    second_stk, second_vol = ut.process_json_data(list_items,option_type,second_date_compare,second_date_row.indice.values[0])
+def set_display_comparator_children(
+    option_date_first,
+    option_date_second,
+    option_type,
+    first_date_compare,
+    second_date_compare
+    ):
 
-    df_first = pd.DataFrame({'impliedVolatility': first_vol, 'Strike' : first_stk})
-    df_second = pd.DataFrame({'impliedVolatility': second_vol, 'Strike' : second_stk})
-    fig = go.Figure([
-        go.Scatter(
-            name=first_date_compare +' Data',
-            y=df_first['impliedVolatility'],
-            x=df_first['Strike'],
-            mode='lines',
-            marker=dict(color="#444"),
-            line=dict(width=1),
-        ),
-        go.Scatter(
-            name=second_date_compare +' Data',
-            y=df_second['impliedVolatility'],
-            x=df_second['Strike'],
-            marker=dict(color="#AF33FF"),
-            line=dict(width=1),
-            mode='lines',
-        )
-    ])
+    
+    b = db.get_data_from_date(first_date_compare)
+    c = db.get_data_from_date(second_date_compare)
+
+    
+    first_stk = b[option_type][option_date_first]['strikes']
+    first_vol = b[option_type][option_date_first]['impliedVolatility']
+    second_stk = c[option_type][option_date_second]['strikes']
+    second_vol = c[option_type][option_date_second]['impliedVolatility']
+
+    df = pd.DataFrame([{'impliedVolatility': first_vol, 'Strike' : first_stk, 'date':option_date_first}, 
+                            {'impliedVolatility': second_vol, 'Strike' : second_stk, 'date': option_date_second}])
+    fig = px.line(df[df.date.isin([option_date_first,option_date_second])], x='Strike', y='impliedVolatility',color='date', markers = True)
 
     return fig
 
 
 
 if __name__ == "__main__":
-   app.run_server(debug=False, host="0.0.0.0", port=8080)
+   app.run_server(debug=True, host="0.0.0.0", port=8080, threaded=True)
