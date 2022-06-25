@@ -15,17 +15,8 @@ def data_to_df(day_to_compare,data,option_type):
     for j in data.keys():  # j tipo de opcion/futuro
         if j != 'FUTURO':
             for k in data[j].keys():  # dates de opciones
-                _strikes = data[j][k]['strikes']
-                _impliedVolatility = data[j][k]['impliedVolatility']
-                strikes = []
-                impliedVolatility = []
-                for i in range(len(_impliedVolatility)): # Con esto eliminamos los None y 1e-05
-                    if float(_impliedVolatility[i] or 0) <= 0.001: 
-                        continue
-                    else:
-                        strikes.append(_strikes[i])
-                        impliedVolatility.append(_impliedVolatility[i])
-                print(impliedVolatility)
+                strikes = data[j][k]['strikes']
+                impliedVolatility = data[j][k]['impliedVolatility']
                 delta_days =(pd.to_datetime(k) - pd.to_datetime(day_to_compare)).days
                 if delta_days == 0:
                     delta_days = 0.5 

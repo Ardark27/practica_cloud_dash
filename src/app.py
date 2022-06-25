@@ -14,9 +14,9 @@ from dash_bootstrap_templates import ThemeSwitchAIO
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP]) #[dark,light], [CYBORG,BOOTSTRAP]
 
 template_theme1 = 'flatly'
-template_theme2 = 'vapor'
+template_theme2 = 'slate'
 url_theme1 = dbc.themes.FLATLY
-url_theme2 = dbc.themes.VAPOR
+url_theme2 = dbc.themes.SLATE
 
 dates_list = db.get_all_dates()
 option_type = ['CALL', 'PUT']
@@ -265,7 +265,7 @@ def set_display_surface_children(toggle,option_type,data_date):
     option_data = ut.data_to_df(dates_list[data_date],a,option_type)
     X,Y,Z = ut.prepare_df_to_graph(option_data)
 
-    fig = go.Figure(data=[go.Surface(z=Z, x=X, y=Y)])
+    fig = go.Figure(data=[go.Surface(z=Z, x=X, y=Y, colorscale='Agsunset')])
     fig.update_layout(#title='Superficie de volatidad',
                     autosize=True,
                     #width=750,
@@ -273,8 +273,8 @@ def set_display_surface_children(toggle,option_type,data_date):
                     margin=dict(l=20, r=30, b=65, t=50),
                     scene=dict(
                         xaxis_title='Strike',
-                        yaxis_title='Days_to_go',
-                        zaxis_title='ImpliedVolatility'
+                        yaxis_title='Días a vencimiento',
+                        zaxis_title='Volatilidad implícita'
                     ),template=template)
 
     return fig
@@ -319,4 +319,4 @@ def set_display_comparator_children(
 
 
 if __name__ == "__main__":
-   app.run_server(debug=False, host="0.0.0.0", port=8080)
+   app.run_server(debug=True, host="0.0.0.0", port=8080)
