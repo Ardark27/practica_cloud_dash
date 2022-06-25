@@ -20,3 +20,8 @@ six==1.16.0
 tenacity==8.0.1
 Werkzeug==2.1.2
 zipp==3.8.0
+boto3==1.24.13
+python-dotenv==0.20.0
+scipy==1.8.1
+dash-bootstrap-components==1.1.0
+dash-bootstrap-templates==1.0.5
