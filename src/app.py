@@ -31,7 +31,7 @@ app.layout = dbc.Container(
         dbc.Tabs(
             [
                 dbc.Tab(label="Opción simple", tab_id="option-simple"),
-                dbc.Tab(label="Comparación de opciones", tab_id="option-comparator"),
+                dbc.Tab(label="Comparador de opciones", tab_id="option-comparator"),
                 dbc.Tab(label="Superficie de volatilidad", tab_id="surface-vol"),
             ],
             id="tabs",
@@ -90,7 +90,7 @@ def render_tab_content(toggle,active_tab):
                 inputClassName="btn-check",
                 labelClassName="btn btn-outline-primary",
                 labelCheckedClassName="active",
-                options=[{'label': i, 'value': i} for i in ['prices', 'impliedVolatility']],
+                options=[{'label': i, 'value': i} for i in ['Precio', 'Volatilidad Implícita']],
                 value='impliedVolatility'
             ),
             ],
@@ -168,7 +168,8 @@ def render_tab_content(toggle,active_tab):
                 ),
                 dcc.Slider(0,len(dates_list)-1,step=None,
                     id='slider-surface',
-                    marks={i:dates_list[i] for i in range(len(dates_list))},
+                    marks=None,
+                    #marks={i:dates_list[i] for i in range(len(dates_list))}, # descomentar para poner fechas en el slider, pero no se ve bien
                     value=0
                 ),
                 html.Br(),
