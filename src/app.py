@@ -25,7 +25,7 @@ app.layout = dbc.Container(
     [
         dcc.Store(id="store"),
         html.Br(),
-        html.H1("Options Dashboard"),
+        html.H1("Options Dashboard MiniIbex"),
         ThemeSwitchAIO(aio_id="theme", themes=[url_theme1, url_theme2]),
         html.Hr(),
         dbc.Tabs(
@@ -90,7 +90,7 @@ def render_tab_content(toggle,active_tab):
                 inputClassName="btn-check",
                 labelClassName="btn btn-outline-primary",
                 labelCheckedClassName="active",
-                options=[{'label': i, 'value': i} for i in ['Precio', 'Volatilidad Implícita']],
+                options=[{'label': i, 'value': j} for i,j in zip(['Precio', 'Volatilidad implícita'],['prices', 'impliedVolatility'])],
                 value='impliedVolatility'
             ),
             ],
@@ -320,4 +320,4 @@ def set_display_comparator_children(
 
 
 if __name__ == "__main__":
-   app.run_server(debug=True, host="0.0.0.0", port=8080)
+   app.run_server(debug=False, host="0.0.0.0", port=8080)
