@@ -28,9 +28,9 @@ docker run -p 8080:8080 dash
 
 Now you have access to:
 * Dashboard: http://127.0.0.1:8080/
-<!---
- (* Dashboard Cloud Run url: https://practica-cloud-dash-t3gv4buioa-uc.a.run.app/ (May take a while, as it is serverless))
--->
+
+ * Dashboard Cloud Run url: https://practica-cloud-dash-y7xai6tbmq-no.a.run.app (May take a while, as it is serverless)
+
 ## Creation process:
 
 The following services have been used in this practice:
