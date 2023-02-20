@@ -10,7 +10,7 @@ There are only two prerequisites:
 Having both, you'll need to clone the repository:
 
 ``` bash
-git clone https://github.com/chalangui/practica_cloud_dash
+git clone https://github.com/Ardark27/practica_cloud_dash
 ```
 
 ## Usage
